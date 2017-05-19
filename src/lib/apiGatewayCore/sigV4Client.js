@@ -22,7 +22,7 @@ import urlParser from 'url';
 import utils from './utils';
 
 const sigV4ClientFactory = {};
-sigV4ClientFactory.newClient = function(config) {
+sigV4ClientFactory.newClient = function (config) {
   let AWS_SHA_256 = 'AWS4-HMAC-SHA256';
   let AWS4_REQUEST = 'aws4_request';
   let AWS4 = 'AWS4';
@@ -40,7 +40,7 @@ sigV4ClientFactory.newClient = function(config) {
   }
 
   function hmac(secret, value) {
-    return HmacSHA256(value, secret, {asBytes: true}); // eslint-disable-line
+    return HmacSHA256(value, secret, { asBytes: true }); // eslint-disable-line
   }
 
   function buildCanonicalRequest(method, path, queryParams, headers, payload) {
@@ -76,9 +76,15 @@ sigV4ClientFactory.newClient = function(config) {
     let canonicalQueryString = '';
     for (let i = 0; i < sortedQueryParams.length; i++) {
       canonicalQueryString += sortedQueryParams[i]
-        + '=' + encodeURIComponent(queryParams[sortedQueryParams[i]]) + '&';
+        + '=' + fixedEncodeURIComponent(queryParams[sortedQueryParams[i]]) + '&';
     }
     return canonicalQueryString.substr(0, canonicalQueryString.length - 1);
+  }
+
+  function fixedEncodeURIComponent(str) {
+    return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+      return '%' + c.charCodeAt(0).toString(16);
+    });
   }
 
   function buildCanonicalHeaders(headers) {
@@ -136,8 +142,8 @@ sigV4ClientFactory.newClient = function(config) {
       + ', SignedHeaders=' + buildCanonicalSignedHeaders(headers) + ', Signature=' + signature;
   }
 
-  let awsSigV4Client = { };
-  if(config.accessKey === undefined || config.secretKey === undefined) {
+  let awsSigV4Client = {};
+  if (config.accessKey === undefined || config.secretKey === undefined) {
     return awsSigV4Client;
   }
   awsSigV4Client.accessKey = utils.assertDefined(config.accessKey, 'accessKey');
@@ -147,7 +153,7 @@ sigV4ClientFactory.newClient = function(config) {
   awsSigV4Client.region = utils.assertDefined(config.region, 'region');
   awsSigV4Client.endpoint = utils.assertDefined(config.endpoint, 'endpoint');
 
-  awsSigV4Client.makeRequest = function(request) {
+  awsSigV4Client.makeRequest = function (request) {
     let verb = utils.assertDefined(request.verb, 'verb');
     let path = utils.assertDefined(request.path, 'path');
     let queryParams = utils.copy(request.queryParams);
@@ -160,12 +166,12 @@ sigV4ClientFactory.newClient = function(config) {
     }
 
     // If the user has not specified an override for Content type the use default
-    if(headers['Content-Type'] === undefined) {
+    if (headers['Content-Type'] === undefined) {
       headers['Content-Type'] = config.defaultContentType;
     }
 
     // If the user has not specified an override for Accept type the use default
-    if(headers['Accept'] === undefined) {
+    if (headers['Accept'] === undefined) {
       headers['Accept'] = config.defaultAcceptType;
     }
 
@@ -178,7 +184,7 @@ sigV4ClientFactory.newClient = function(config) {
     }
 
     // If there is no body remove the content-type header so it is not included in SigV4 calculation
-    if(body === '' || body === undefined || body === null) {
+    if (body === '' || body === undefined || body === null) {
       delete headers['Content-Type'];
     }
 
@@ -208,7 +214,7 @@ sigV4ClientFactory.newClient = function(config) {
       headers,
       signature
     );
-    if(awsSigV4Client.sessionToken !== undefined && awsSigV4Client.sessionToken !== '') {
+    if (awsSigV4Client.sessionToken !== undefined && awsSigV4Client.sessionToken !== '') {
       headers[X_AMZ_SECURITY_TOKEN] = awsSigV4Client.sessionToken;
     }
     delete headers[HOST];
@@ -220,7 +226,7 @@ sigV4ClientFactory.newClient = function(config) {
     }
 
     // Need to re-attach Content-Type if it is not specified at this point
-    if(headers['Content-Type'] === undefined) {
+    if (headers['Content-Type'] === undefined) {
       headers['Content-Type'] = config.defaultContentType;
     }
 
