@@ -15,11 +15,14 @@
 /* eslint max-len: ["error", 100]*/
 
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const SHA256 = require('crypto-js/sha256');
 const encHex = require('crypto-js/enc-hex');
 const HmacSHA256 = require('crypto-js/hmac-sha256');
 const urlParser = require('url');
 const utils = require('./utils');
+
+axiosRetry(axios, { retries: 3 });
 
 const sigV4ClientFactory = {};
 
