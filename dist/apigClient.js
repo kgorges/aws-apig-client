@@ -1,19 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _urlTemplate = require('url-template');
-
-var _urlTemplate2 = _interopRequireDefault(_urlTemplate);
-
-var _apiGatewayClient = require('./lib/apiGatewayCore/apiGatewayClient');
-
-var _apiGatewayClient2 = _interopRequireDefault(_apiGatewayClient);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*
  * Copyright 2010-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -31,10 +15,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint max-len: ["error", 100]*/
 
 // import 'babel-polyfill';
-var apigClientFactory = {};
+const uritemplate = require('url-template');
+const apiGatewayClientFactory = require('./lib/apiGatewayCore/apiGatewayClient');
 
-apigClientFactory.newClient = function (config) {
-  var apigClient = {};
+const apigClientFactory = {};
+module.exports = apigClientFactory;
+
+apigClientFactory.newClient = (config) => {
+  const apigClient = {};
   if (config === undefined) {
     config = {
       accessKey: '',
@@ -43,79 +31,90 @@ apigClientFactory.newClient = function (config) {
       region: '',
       apiKey: undefined,
       invokeUrl: '',
+      service: '',
       defaultContentType: 'application/json',
-      defaultAcceptType: 'application/json'
+      defaultAcceptType: 'application/json',
     };
   }
-  if (config.accessKey === undefined) {
+  if (typeof config.accessKey === 'undefined') {
     config.accessKey = '';
   }
-  if (config.secretKey === undefined) {
+  if (typeof config.secretKey === 'undefined') {
     config.secretKey = '';
   }
-  if (config.apiKey === undefined) {
+  if (typeof config.apiKey === 'undefined') {
     config.apiKey = '';
   }
-  if (config.sessionToken === undefined) {
+  if (typeof config.sessionToken === 'undefined') {
     config.sessionToken = '';
   }
-  if (config.region === undefined) {
+  if (typeof config.region === 'undefined') {
     config.region = 'us-east-1';
   }
+  if (typeof config.service === 'undefined') {
+    config.service = 'execute-api';
+  }
   // If defaultContentType is not defined then default to application/json
-  if (config.defaultContentType === undefined) {
+  if (typeof config.defaultContentType === 'undefined') {
     config.defaultContentType = 'application/json';
   }
   // If defaultAcceptType is not defined then default to application/json
-  if (config.defaultAcceptType === undefined) {
+  if (typeof config.defaultAcceptType === 'undefined') {
     config.defaultAcceptType = 'application/json';
   }
 
   // extract endpoint and path from url
-  var invokeUrl = config.invokeUrl;
-  var endpoint = /(^https?:\/\/[^\/]+)/g.exec(invokeUrl)[1];
-  var pathComponent = invokeUrl.substring(endpoint.length);
+  const invokeUrl = config.invokeUrl;
+  const endpoint = /(^https?:\/\/[^\/]+)/g.exec(invokeUrl)[1];
+  const pathComponent = invokeUrl.substring(endpoint.length);
 
-  var sigV4ClientConfig = {
+  const sigV4ClientConfig = {
     accessKey: config.accessKey,
     secretKey: config.secretKey,
     sessionToken: config.sessionToken,
-    serviceName: 'execute-api',
+    serviceName: config.service,
     region: config.region,
     endpoint: endpoint,
     defaultContentType: config.defaultContentType,
-    defaultAcceptType: config.defaultAcceptType
+    defaultAcceptType: config.defaultAcceptType,
   };
 
-  var authType = 'NONE';
-  if (sigV4ClientConfig.accessKey !== undefined && sigV4ClientConfig.accessKey !== '' && sigV4ClientConfig.secretKey !== undefined && sigV4ClientConfig.secretKey !== '') {
+  let authType = 'NONE';
+  if (
+    sigV4ClientConfig.accessKey !== undefined
+    && sigV4ClientConfig.accessKey !== ''
+    && sigV4ClientConfig.secretKey !== undefined
+    && sigV4ClientConfig.secretKey !== ''
+  ) {
     authType = 'AWS_IAM';
   }
 
-  var simpleHttpClientConfig = {
+  const simpleHttpClientConfig = {
     endpoint: endpoint,
     defaultContentType: config.defaultContentType,
-    defaultAcceptType: config.defaultAcceptType
+    defaultAcceptType: config.defaultAcceptType,
   };
 
-  var apiGatewayClient = _apiGatewayClient2.default.newClient(simpleHttpClientConfig, sigV4ClientConfig);
+  const apiGatewayClient = apiGatewayClientFactory.newClient(
+    simpleHttpClientConfig,
+    sigV4ClientConfig
+  );
 
-  apigClient.invokeApi = function (params, pathTemplate, method, additionalParams, body) {
+  apigClient.invokeApi = (params, pathTemplate, method, additionalParams, body) => {
     if (additionalParams === undefined) additionalParams = {};
     if (body === undefined) body = '';
 
-    var request = {
+    const request = {
       verb: method.toUpperCase(),
-      path: pathComponent + _urlTemplate2.default.parse(pathTemplate).expand(params),
+      path: pathComponent + uritemplate.parse(pathTemplate).expand(params),
       headers: additionalParams.headers || {},
       queryParams: additionalParams.queryParams,
-      body: body
+      body: body,
     };
 
     return apiGatewayClient.makeRequest(request, authType, additionalParams, config.apiKey);
   };
 
+
   return apigClient;
 };
-
-exports.default = apigClientFactory;

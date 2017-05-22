@@ -1,11 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /*
  * Copyright 2010-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -22,42 +14,42 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  */
 /* eslint max-len: ["error", 100]*/
 
-var utils = {
-  assertDefined: function assertDefined(object, name) {
+const utils = {
+  assertDefined: function (object, name) {
     if (object === undefined) {
-      throw new Error(name + ' must be defined');
+      throw new Error(`${name} must be defined`);
     } else {
       return object;
     }
   },
-  assertParametersDefined: function assertParametersDefined(params, keys, ignore) {
+  assertParametersDefined: function (params, keys, ignore) {
     if (keys === undefined) {
       return;
     }
     if (keys.length > 0 && params === undefined) {
       params = {};
     }
-    for (var i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       if (!utils.contains(ignore, keys[i])) {
         utils.assertDefined(params[keys[i]], keys[i]);
       }
     }
   },
-  parseParametersToObject: function parseParametersToObject(params, keys) {
+  parseParametersToObject: function (params, keys) {
     if (params === undefined) {
       return {};
     }
-    var object = {};
-    for (var i = 0; i < keys.length; i++) {
+    let object = {};
+    for (let i = 0; i < keys.length; i++) {
       object[keys[i]] = params[keys[i]];
     }
     return object;
   },
-  contains: function contains(a, obj) {
+  contains: function (a, obj) {
     if (a === undefined) {
       return false;
     }
-    var i = a.length;
+    let i = a.length;
     while (i--) {
       if (a[i] === obj) {
         return true;
@@ -65,28 +57,28 @@ var utils = {
     }
     return false;
   },
-  copy: function copy(obj) {
-    if (null == obj || 'object' != (typeof obj === 'undefined' ? 'undefined' : _typeof(obj))) return obj;
-    var copy = obj.constructor();
-    var attr = null;
+  copy: function (obj) {
+    if (null == obj || 'object' != typeof obj) return obj;
+    let copy = obj.constructor();
+    let attr = null;
     for (attr in obj) {
       if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
     }
     return copy;
   },
-  mergeInto: function mergeInto(baseObj, additionalProps) {
-    if (null == baseObj || 'object' != (typeof baseObj === 'undefined' ? 'undefined' : _typeof(baseObj))) return baseObj;
-    var merged = baseObj.constructor();
-    var attr = null;
+  mergeInto: function (baseObj, additionalProps) {
+    if (null == baseObj || 'object' != typeof baseObj) return baseObj;
+    let merged = baseObj.constructor();
+    let attr = null;
     for (attr in baseObj) {
       if (baseObj.hasOwnProperty(attr)) merged[attr] = baseObj[attr];
     }
-    if (null == additionalProps || 'object' != (typeof additionalProps === 'undefined' ? 'undefined' : _typeof(additionalProps))) return baseObj;
+    if (null == additionalProps || 'object' != typeof additionalProps) return baseObj;
     for (attr in additionalProps) {
       if (additionalProps.hasOwnProperty(attr)) merged[attr] = additionalProps[attr];
     }
     return merged;
-  }
+  },
 };
 
-exports.default = utils;
+module.exports = utils;

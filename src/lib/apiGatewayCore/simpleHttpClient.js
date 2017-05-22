@@ -14,10 +14,13 @@
  */
 /* eslint max-len: ["error", 100]*/
 
-import axios from 'axios';
-import utils from './utils';
+const axios = require('axios');
+const utils = require('./utils');
 
 const simpleHttpClientFactory = {};
+
+module.exports = simpleHttpClientFactory;
+
 simpleHttpClientFactory.newClient = (config) => {
   function buildCanonicalQueryString(queryParams) {
     // Build a properly encoded query string from a QueryParam object
@@ -36,10 +39,10 @@ simpleHttpClientFactory.newClient = (config) => {
     return canonicalQueryString.substr(0, canonicalQueryString.length - 1);
   }
 
-  let simpleHttpClient = { };
+  let simpleHttpClient = {};
   simpleHttpClient.endpoint = utils.assertDefined(config.endpoint, 'endpoint');
 
-  simpleHttpClient.makeRequest = function(request) {
+  simpleHttpClient.makeRequest = function (request) {
     let verb = utils.assertDefined(request.verb, 'verb');
     let path = utils.assertDefined(request.path, 'path');
     let queryParams = utils.copy(request.queryParams);
@@ -52,12 +55,12 @@ simpleHttpClientFactory.newClient = (config) => {
     }
 
     // If the user has not specified an override for Content type the use default
-    if(headers['Content-Type'] === undefined) {
+    if (headers['Content-Type'] === undefined) {
       headers['Content-Type'] = config.defaultContentType;
     }
 
     // If the user has not specified an override for Accept type the use default
-    if(headers['Accept'] === undefined) {
+    if (headers['Accept'] === undefined) {
       headers['Accept'] = config.defaultAcceptType;
     }
 
@@ -81,5 +84,3 @@ simpleHttpClientFactory.newClient = (config) => {
   };
   return simpleHttpClient;
 };
-
-export default simpleHttpClientFactory;

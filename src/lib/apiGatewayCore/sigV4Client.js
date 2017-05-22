@@ -14,14 +14,17 @@
  */
 /* eslint max-len: ["error", 100]*/
 
-import axios from 'axios';
-import SHA256 from 'crypto-js/sha256';
-import encHex from 'crypto-js/enc-hex';
-import HmacSHA256 from 'crypto-js/hmac-sha256';
-import urlParser from 'url';
-import utils from './utils';
+const axios = require('axios');
+const SHA256 = require('crypto-js/sha256');
+const encHex = require('crypto-js/enc-hex');
+const HmacSHA256 = require('crypto-js/hmac-sha256');
+const urlParser = require('url');
+const utils = require('./utils');
 
 const sigV4ClientFactory = {};
+
+module.exports = sigV4ClientFactory;
+
 sigV4ClientFactory.newClient = function (config) {
   let AWS_SHA_256 = 'AWS4-HMAC-SHA256';
   let AWS4_REQUEST = 'aws4_request';
@@ -241,5 +244,3 @@ sigV4ClientFactory.newClient = function (config) {
 
   return awsSigV4Client;
 };
-
-export default sigV4ClientFactory;

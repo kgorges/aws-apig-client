@@ -12,18 +12,21 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-import utils from './utils';
-import sigV4ClientFactory from './sigV4Client.js';
-import simpleHttpClientFactory from './simpleHttpClient.js';
+const utils = require('./utils');
+const sigV4ClientFactory = require('./sigV4Client.js');
+const simpleHttpClientFactory = require('./simpleHttpClient.js');
 
 const apiGatewayClientFactory = {};
-apiGatewayClientFactory.newClient = function(simpleHttpClientConfig, sigV4ClientConfig) {
-  let apiGatewayClient = { };
+
+module.exports = apiGatewayClientFactory;
+
+apiGatewayClientFactory.newClient = function (simpleHttpClientConfig, sigV4ClientConfig) {
+  let apiGatewayClient = {};
   // Spin up 2 httpClients, one for simple requests, one for SigV4
   let sigV4Client = sigV4ClientFactory.newClient(sigV4ClientConfig);
   let simpleHttpClient = simpleHttpClientFactory.newClient(simpleHttpClientConfig);
 
-  apiGatewayClient.makeRequest = function(request, authType, additionalParams, apiKey) {
+  apiGatewayClient.makeRequest = function (request, authType, additionalParams, apiKey) {
     // Default the request to use the simple http client
     let clientToUse = simpleHttpClient;
 
@@ -57,5 +60,3 @@ apiGatewayClientFactory.newClient = function(simpleHttpClientConfig, sigV4Client
   };
   return apiGatewayClient;
 };
-
-export default apiGatewayClientFactory;

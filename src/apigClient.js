@@ -15,10 +15,11 @@
 /* eslint max-len: ["error", 100]*/
 
 // import 'babel-polyfill';
-import uritemplate from 'url-template';
-import apiGatewayClientFactory from './lib/apiGatewayCore/apiGatewayClient';
+const uritemplate = require('url-template');
+const apiGatewayClientFactory = require('./lib/apiGatewayCore/apiGatewayClient');
 
 const apigClientFactory = {};
+module.exports = apigClientFactory;
 
 apigClientFactory.newClient = (config) => {
   const apigClient = {};
@@ -85,7 +86,7 @@ apigClientFactory.newClient = (config) => {
     && sigV4ClientConfig.secretKey !== undefined
     && sigV4ClientConfig.secretKey !== ''
   ) {
-      authType = 'AWS_IAM';
+    authType = 'AWS_IAM';
   }
 
   const simpleHttpClientConfig = {
@@ -100,15 +101,15 @@ apigClientFactory.newClient = (config) => {
   );
 
   apigClient.invokeApi = (params, pathTemplate, method, additionalParams, body) => {
-    if (additionalParams===undefined) additionalParams={};
-    if (body===undefined) body='';
+    if (additionalParams === undefined) additionalParams = {};
+    if (body === undefined) body = '';
 
     const request = {
-        verb: method.toUpperCase(),
-        path: pathComponent + uritemplate.parse(pathTemplate).expand(params),
-        headers: additionalParams.headers || {},
-        queryParams: additionalParams.queryParams,
-        body: body,
+      verb: method.toUpperCase(),
+      path: pathComponent + uritemplate.parse(pathTemplate).expand(params),
+      headers: additionalParams.headers || {},
+      queryParams: additionalParams.queryParams,
+      body: body,
     };
 
     return apiGatewayClient.makeRequest(request, authType, additionalParams, config.apiKey);
@@ -117,5 +118,3 @@ apigClientFactory.newClient = (config) => {
 
   return apigClient;
 };
-
-export default apigClientFactory;

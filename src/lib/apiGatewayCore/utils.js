@@ -15,14 +15,14 @@
 /* eslint max-len: ["error", 100]*/
 
 const utils = {
-  assertDefined: function(object, name) {
+  assertDefined: function (object, name) {
     if (object === undefined) {
       throw new Error(`${name} must be defined`);
     } else {
       return object;
     }
   },
-  assertParametersDefined: function(params, keys, ignore) {
+  assertParametersDefined: function (params, keys, ignore) {
     if (keys === undefined) {
       return;
     }
@@ -30,23 +30,23 @@ const utils = {
       params = {};
     }
     for (let i = 0; i < keys.length; i++) {
-      if(!utils.contains(ignore, keys[i])) {
+      if (!utils.contains(ignore, keys[i])) {
         utils.assertDefined(params[keys[i]], keys[i]);
       }
     }
   },
-  parseParametersToObject: function(params, keys) {
+  parseParametersToObject: function (params, keys) {
     if (params === undefined) {
       return {};
     }
-    let object = { };
+    let object = {};
     for (let i = 0; i < keys.length; i++) {
       object[keys[i]] = params[keys[i]];
     }
     return object;
   },
-  contains: function(a, obj) {
-    if(a === undefined) {
+  contains: function (a, obj) {
+    if (a === undefined) {
       return false;
     }
     let i = a.length;
@@ -57,7 +57,7 @@ const utils = {
     }
     return false;
   },
-  copy: function(obj) {
+  copy: function (obj) {
     if (null == obj || 'object' != typeof obj) return obj;
     let copy = obj.constructor();
     let attr = null;
@@ -66,7 +66,7 @@ const utils = {
     }
     return copy;
   },
-  mergeInto: function(baseObj, additionalProps) {
+  mergeInto: function (baseObj, additionalProps) {
     if (null == baseObj || 'object' != typeof baseObj) return baseObj;
     let merged = baseObj.constructor();
     let attr = null;
@@ -81,4 +81,4 @@ const utils = {
   },
 };
 
-export default utils;
+module.exports = utils;

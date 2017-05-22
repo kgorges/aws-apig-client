@@ -1,19 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _axios = require('axios');
-
-var _axios2 = _interopRequireDefault(_axios);
-
-var _utils = require('./utils');
-
-var _utils2 = _interopRequireDefault(_utils);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /*
  * Copyright 2010-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -30,35 +14,42 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 /* eslint max-len: ["error", 100]*/
 
-var simpleHttpClientFactory = {};
-simpleHttpClientFactory.newClient = function (config) {
+const axios = require('axios');
+const utils = require('./utils');
+
+const simpleHttpClientFactory = {};
+
+module.exports = simpleHttpClientFactory;
+
+simpleHttpClientFactory.newClient = (config) => {
   function buildCanonicalQueryString(queryParams) {
     // Build a properly encoded query string from a QueryParam object
     if (Object.keys(queryParams).length < 1) {
       return '';
     }
 
-    var canonicalQueryString = '';
-    for (var property in queryParams) {
+    let canonicalQueryString = '';
+    for (let property in queryParams) {
       if (queryParams.hasOwnProperty(property)) {
-        canonicalQueryString += encodeURIComponent(property) + '=' + encodeURIComponent(queryParams[property]) + '&';
+        canonicalQueryString += encodeURIComponent(property)
+          + '=' + encodeURIComponent(queryParams[property]) + '&';
       }
     }
 
     return canonicalQueryString.substr(0, canonicalQueryString.length - 1);
   }
 
-  var simpleHttpClient = {};
-  simpleHttpClient.endpoint = _utils2.default.assertDefined(config.endpoint, 'endpoint');
+  let simpleHttpClient = {};
+  simpleHttpClient.endpoint = utils.assertDefined(config.endpoint, 'endpoint');
 
   simpleHttpClient.makeRequest = function (request) {
-    var verb = _utils2.default.assertDefined(request.verb, 'verb');
-    var path = _utils2.default.assertDefined(request.path, 'path');
-    var queryParams = _utils2.default.copy(request.queryParams);
+    let verb = utils.assertDefined(request.verb, 'verb');
+    let path = utils.assertDefined(request.path, 'path');
+    let queryParams = utils.copy(request.queryParams);
     if (queryParams === undefined) {
       queryParams = {};
     }
-    var headers = _utils2.default.copy(request.headers);
+    let headers = utils.copy(request.headers);
     if (headers === undefined) {
       headers = {};
     }
@@ -73,25 +64,23 @@ simpleHttpClientFactory.newClient = function (config) {
       headers['Accept'] = config.defaultAcceptType;
     }
 
-    var body = _utils2.default.copy(request.body);
+    let body = utils.copy(request.body);
     if (body === undefined) {
       body = '';
     }
 
-    var url = config.endpoint + path;
-    var queryString = buildCanonicalQueryString(queryParams);
+    let url = config.endpoint + path;
+    let queryString = buildCanonicalQueryString(queryParams);
     if (queryString != '') {
       url += '?' + queryString;
     }
-    var simpleHttpRequest = {
+    let simpleHttpRequest = {
       method: verb,
       url: url,
       headers: headers,
-      data: body
+      data: body,
     };
-    return (0, _axios2.default)(simpleHttpRequest);
+    return axios(simpleHttpRequest);
   };
   return simpleHttpClient;
 };
-
-exports.default = simpleHttpClientFactory;
